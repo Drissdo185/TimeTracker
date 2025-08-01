@@ -1,124 +1,163 @@
-import Image from "next/image";
+"use client";
+import { User } from "lucide-react";
+import { useState } from "react";
+import Sidebar from "./components/Sidebar";
+import StreakBadge from "./components/StreakBadge";
+import DailyGoals from "./components/DailyGoals";
+import Stopwatch from "./components/Stopwatch";
 
 export default function Home() {
+  const [streak, setStreak] = useState(0);
+  
+  const [goals, setGoals] = useState([
+    {
+      id: 1,
+      title: "Launch New Product",
+      completed: false,
+      expanded: false,
+      subTasks: [
+        { id: 1, text: "Complete market research", completed: false },
+        { id: 2, text: "Design product mockups", completed: false },
+        { id: 3, text: "Develop MVP features", completed: false }
+      ]
+    },
+    {
+      id: 2,
+      title: "Improve Team Productivity",
+      completed: false,
+      expanded: false,
+      subTasks: [
+        { id: 1, text: "Implement daily standups", completed: false },
+        { id: 2, text: "Set up project management tool", completed: false },
+        { id: 3, text: "Create team guidelines", completed: false }
+      ]
+    },
+    {
+      id: 3,
+      title: "Personal Development",
+      completed: false,
+      expanded: false,
+      subTasks: [
+        { id: 1, text: "Complete React certification", completed: false },
+        { id: 2, text: "Read 2 technical books", completed: false },
+        { id: 3, text: "Attend 3 conferences", completed: false }
+      ]
+    }
+  ]);
+
+  const addGoal = (title) => {
+    const newGoal = {
+      id: Math.max(...goals.map(g => g.id), 0) + 1,
+      title,
+      completed: false,
+      expanded: false,
+      subTasks: []
+    };
+    setGoals([...goals, newGoal]);
+  };
+
+  const editGoal = (goalId, title) => {
+    setGoals(goals.map(goal =>
+      goal.id === goalId ? { ...goal, title } : goal
+    ));
+  };
+
+  const removeGoal = (goalId) => {
+    setGoals(goals.filter(goal => goal.id !== goalId));
+  };
+
+  const addSubTask = (goalId, text) => {
+    setGoals(goals.map(goal =>
+      goal.id === goalId
+        ? {
+            ...goal,
+            subTasks: [
+              ...goal.subTasks,
+              {
+                id: Math.max(...goal.subTasks.map(st => st.id), 0) + 1,
+                text,
+                completed: false
+              }
+            ]
+          }
+        : goal
+    ));
+  };
+
+  const editSubTask = (goalId, subTaskId, text) => {
+    setGoals(goals.map(goal =>
+      goal.id === goalId
+        ? {
+            ...goal,
+            subTasks: goal.subTasks.map(subTask =>
+              subTask.id === subTaskId
+                ? { ...subTask, text }
+                : subTask
+            )
+          }
+        : goal
+    ));
+  };
+
+  const removeSubTask = (goalId, subTaskId) => {
+    setGoals(goals.map(goal =>
+      goal.id === goalId
+        ? {
+            ...goal,
+            subTasks: goal.subTasks.filter(subTask => subTask.id !== subTaskId)
+          }
+        : goal
+    ));
+  };
+
+  const toggleSubTask = (goalId, subTaskId) => {
+    const updatedGoals = goals.map(goal =>
+      goal.id === goalId
+        ? {
+            ...goal,
+            subTasks: goal.subTasks.map(subTask =>
+              subTask.id === subTaskId
+                ? { ...subTask, completed: !subTask.completed }
+                : subTask
+            )
+          }
+        : goal
+    );
+    
+    setGoals(updatedGoals);
+    
+    // Check if all goals are completed
+    const allGoalsCompleted = updatedGoals.every(goal => 
+      goal.subTasks.every(subTask => subTask.completed)
+    );
+    
+    if (allGoalsCompleted) {
+      setStreak(prev => prev + 1);
+      // Reset all goals for the next day
+      setTimeout(() => {
+        setGoals(updatedGoals.map(goal => ({
+          ...goal,
+          expanded: false,
+          subTasks: goal.subTasks.map(subTask => ({
+            ...subTask,
+            completed: false
+          }))
+        })));
+      }, 2000);
+    }
+  };
+
+  const getGoalProgress = (goal) => {
+    const completedSubTasks = goal.subTasks.filter(task => task.completed).length;
+    return Math.round((completedSubTasks / goal.subTasks.length) * 100);
+  };
+
+
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar - Keep your existing sidebar code */}
-      <div className="w-64 bg-white shadow-lg h-screen flex flex-col">
-        {/* Header */}
-        <div className="p-6 border-b">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-purple-500 rounded-lg flex 
-      items-center justify-center">
-              <span className="text-white font-bold">W</span>
-            </div>
-            <h1 className="text-xl font-semibold">Treki</h1>
-          </div>
-        </div>
+      <Sidebar />
 
-        {/* Menu Section */}
-        <div className="flex-1 p-4">
-          <div className="mb-6">
-            <h3 className="text-gray-400 text-sm font-medium 
-      mb-3">Menu</h3>
-            <nav className="space-y-1">
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-purple-600 bg-purple-50 rounded-lg">
-                <span>📊</span>
-                <span>Dashboard</span>
-              </a>
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-gray-600 hover:bg-gray-50 rounded-lg">
-                <span>💡</span>
-                <span>Insights</span>
-              </a>
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-gray-600 hover:bg-gray-50 rounded-lg">
-                <span>🔄</span>
-                <span>Updates</span>
-              </a>
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-gray-600 hover:bg-gray-50 rounded-lg">
-                <span>💬</span>
-                <span>Message</span>
-                <span className="ml-auto bg-gray-200 text-xs px-2 py-1 
-      rounded-full">20</span>
-              </a>
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-gray-600 hover:bg-gray-50 rounded-lg">
-                <span>👥</span>
-                <span>Customers</span>
-              </a>
-            </nav>
-          </div>
-
-          {/* Features Section */}
-          <div className="mb-6">
-            <h3 className="text-gray-400 text-sm font-medium 
-      mb-3">FEATURES</h3>
-            <nav className="space-y-1">
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-gray-600 hover:bg-gray-50 rounded-lg">
-                <span>🔁</span>
-                <span>Recurring</span>
-              </a>
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-gray-600 hover:bg-gray-50 rounded-lg">
-                <span>📋</span>
-                <span>Subscriptions</span>
-              </a>
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-gray-600 hover:bg-gray-50 rounded-lg">
-                <span>💭</span>
-                <span>Feedback</span>
-              </a>
-            </nav>
-          </div>
-
-          {/* General Section */}
-          <div>
-            <h3 className="text-gray-400 text-sm font-medium 
-      mb-3">GENERAL</h3>
-            <nav className="space-y-1">
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-gray-600 hover:bg-gray-50 rounded-lg">
-                <span>⚙️</span>
-                <span>Settings</span>
-              </a>
-              <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-gray-600 hover:bg-gray-50 rounded-lg">
-                <span>❓</span>
-                <span>Help Desk</span>
-              </a>
-            </nav>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="p-4 border-t">
-          <a href="#" className="flex items-center gap-3 px-3 py-2 
-      text-red-500 hover:bg-red-50 rounded-lg mb-4">
-            <span>🚪</span>
-            <span>Log out</span>
-          </a>
-
-          {/* Upgrade Card */}
-          <div className="bg-gradient-to-r from-purple-500 to-blue-500 
-      rounded-lg p-4 text-white">
-            <div className="flex items-center gap-2 mb-2">
-              <span>⭐</span>
-              <span className="font-semibold">Upgrade Pro!</span>
-            </div>
-            <p className="text-sm opacity-90 mb-3">Higher productivity
-      with better organization</p>
-            <button className="bg-white text-purple-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100">
-              Upgrade Pro
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area*/}
+      {/* Main Content Area */}
       <div className="flex-1 p-6 bg-gray-50 overflow-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -130,7 +169,7 @@ export default function Home() {
               <input
                 type="text"
                 placeholder="Search anything..."
-                className="w-80 pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-80 pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <span className="text-gray-400">🔍</span>
@@ -138,112 +177,33 @@ export default function Home() {
             </div>
             
             {/* User Avatar */}
-            <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-medium">
-              O
+            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-medium">
+              <User size={20} />
             </div>
           </div>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Earnings Card */}
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-600 font-medium">Earnings</h3>
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <span className="text-purple-600">💰</span>
-              </div>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-2">$5,567.00</div>
-            <div className="text-sm text-gray-500">Last month: $4,545.00</div>
-          </div>
-
-          {/* Spending Card */}
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-600 font-medium">Spending</h3>
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-green-600">💳</span>
-              </div>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-2">$3,533.00</div>
-            <div className="text-sm text-gray-500">Last month: $3,243.00</div>
-          </div>
-
-          {/* Savings Card */}
-          <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-600 font-medium">Savings</h3>
-              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                <span className="text-orange-600">🏦</span>
-              </div>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-2">$2,324.00</div>
-            <div className="text-sm text-gray-500">Last month: $2,232.00</div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+          <StreakBadge streak={streak} />
         </div>
 
         {/* Bottom Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Side - Chart */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Transactions Overview</h3>
-            <div className="text-3xl font-bold text-gray-900 mb-2">$4,235.00</div>
-            <div className="h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-              <span className="text-gray-500">📊 Chart will go here</span>
-            </div>
-          </div>
+        <div className="max-w-5xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <DailyGoals 
+              goals={goals}
+              onToggleSubTask={toggleSubTask}
+              onAddGoal={addGoal}
+              onEditGoal={editGoal}
+              onRemoveGoal={removeGoal}
+              onAddSubTask={addSubTask}
+              onEditSubTask={editSubTask}
+              onRemoveSubTask={removeSubTask}
+              getGoalProgress={getGoalProgress}
+            />
 
-          {/* Right Side - Recent Orders */}
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Recent orders</h3>
-              <button className="text-sm text-purple-600 hover:text-purple-700">Sort by</button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <div>
-                    <div className="font-medium text-gray-900">INV_000076</div>
-                    <div className="text-sm text-gray-500">17 Apr, 2026</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-medium text-gray-900">$25,500</div>
-                  <div className="text-sm text-green-600">Completed</div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <div>
-                    <div className="font-medium text-gray-900">INV_000075</div>
-                    <div className="text-sm text-gray-500">15 Apr, 2026</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-medium text-gray-900">$32,750</div>
-                  <div className="text-sm text-orange-600">Pending</div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <div>
-                    <div className="font-medium text-gray-900">INV_000073</div>
-                    <div className="text-sm text-gray-500">10 Apr, 2026</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-medium text-gray-900">$15,900</div>
-                  <div className="text-sm text-green-600">Completed</div>
-                </div>
-              </div>
-            </div>
+            <Stopwatch />
           </div>
         </div>
       </div>
