@@ -5,9 +5,9 @@ export default function Sidebar() {
       <div className="p-6">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold">W</span>
+          
           </div>
-          <h1 className="text-xl font-semibold">Treki</h1>
+          <h1 className="text-xl text-green-400 font-semibold">Treki</h1>
         </div>
       </div>
 

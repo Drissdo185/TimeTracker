@@ -5,151 +5,68 @@ import Sidebar from "./components/Sidebar";
 import StreakBadge from "./components/StreakBadge";
 import DailyGoals from "./components/DailyGoals";
 import Stopwatch from "./components/Stopwatch";
+import { useGoals } from "./hooks/useGoals";
 
 export default function Home() {
   const [streak, setStreak] = useState(0);
+  const [selectedTask, setSelectedTask] = useState<{goalId: number, subTaskId: number, taskName: string} | null>(null);
+  const [activeTask, setActiveTask] = useState<{goalId: number, subTaskId: number, taskName: string} | null>(null);
   
-  const [goals, setGoals] = useState([
-    {
-      id: 1,
-      title: "Launch New Product",
-      completed: false,
-      expanded: false,
-      subTasks: [
-        { id: 1, text: "Complete market research", completed: false },
-        { id: 2, text: "Design product mockups", completed: false },
-        { id: 3, text: "Develop MVP features", completed: false }
-      ]
-    },
-    {
-      id: 2,
-      title: "Improve Team Productivity",
-      completed: false,
-      expanded: false,
-      subTasks: [
-        { id: 1, text: "Implement daily standups", completed: false },
-        { id: 2, text: "Set up project management tool", completed: false },
-        { id: 3, text: "Create team guidelines", completed: false }
-      ]
-    },
-    {
-      id: 3,
-      title: "Personal Development",
-      completed: false,
-      expanded: false,
-      subTasks: [
-        { id: 1, text: "Complete React certification", completed: false },
-        { id: 2, text: "Read 2 technical books", completed: false },
-        { id: 3, text: "Attend 3 conferences", completed: false }
-      ]
-    }
-  ]);
+  const {
+    goals,
+    addGoal,
+    editGoal,
+    removeGoal,
+    addSubTask,
+    editSubTask,
+    removeSubTask,
+    toggleSubTask,
+    finishSubTask,
+    getGoalProgress,
+    canAddGoal,
+    canAddSubTask,
+    formatTime,
+    maxDailyGoals,
+    maxSubTasksPerGoal
+  } = useGoals();
 
-  const addGoal = (title) => {
-    const newGoal = {
-      id: Math.max(...goals.map(g => g.id), 0) + 1,
-      title,
-      completed: false,
-      expanded: false,
-      subTasks: []
-    };
-    setGoals([...goals, newGoal]);
+  const handleToggleSubTask = (goalId: number, subTaskId: number) => {
+    toggleSubTask(goalId, subTaskId, () => setStreak(prev => prev + 1));
   };
 
-  const editGoal = (goalId, title) => {
-    setGoals(goals.map(goal =>
-      goal.id === goalId ? { ...goal, title } : goal
-    ));
+  const handleAddGoal = (title: string): boolean => {
+    return addGoal(title);
   };
 
-  const removeGoal = (goalId) => {
-    setGoals(goals.filter(goal => goal.id !== goalId));
+  const handleAddSubTask = (goalId: number, text: string): boolean => {
+    return addSubTask(goalId, text);
   };
 
-  const addSubTask = (goalId, text) => {
-    setGoals(goals.map(goal =>
-      goal.id === goalId
-        ? {
-            ...goal,
-            subTasks: [
-              ...goal.subTasks,
-              {
-                id: Math.max(...goal.subTasks.map(st => st.id), 0) + 1,
-                text,
-                completed: false
-              }
-            ]
-          }
-        : goal
-    ));
+  const handleSelectTask = (goalId: number, subTaskId: number, taskName: string) => {
+    setSelectedTask({ goalId, subTaskId, taskName });
   };
 
-  const editSubTask = (goalId, subTaskId, text) => {
-    setGoals(goals.map(goal =>
-      goal.id === goalId
-        ? {
-            ...goal,
-            subTasks: goal.subTasks.map(subTask =>
-              subTask.id === subTaskId
-                ? { ...subTask, text }
-                : subTask
-            )
-          }
-        : goal
-    ));
-  };
-
-  const removeSubTask = (goalId, subTaskId) => {
-    setGoals(goals.map(goal =>
-      goal.id === goalId
-        ? {
-            ...goal,
-            subTasks: goal.subTasks.filter(subTask => subTask.id !== subTaskId)
-          }
-        : goal
-    ));
-  };
-
-  const toggleSubTask = (goalId, subTaskId) => {
-    const updatedGoals = goals.map(goal =>
-      goal.id === goalId
-        ? {
-            ...goal,
-            subTasks: goal.subTasks.map(subTask =>
-              subTask.id === subTaskId
-                ? { ...subTask, completed: !subTask.completed }
-                : subTask
-            )
-          }
-        : goal
-    );
-    
-    setGoals(updatedGoals);
-    
-    // Check if all goals are completed
-    const allGoalsCompleted = updatedGoals.every(goal => 
-      goal.subTasks.every(subTask => subTask.completed)
-    );
-    
-    if (allGoalsCompleted) {
-      setStreak(prev => prev + 1);
-      // Reset all goals for the next day
-      setTimeout(() => {
-        setGoals(updatedGoals.map(goal => ({
-          ...goal,
-          expanded: false,
-          subTasks: goal.subTasks.map(subTask => ({
-            ...subTask,
-            completed: false
-          }))
-        })));
-      }, 2000);
+  const handleStartTask = () => {
+    if (selectedTask) {
+      setActiveTask(selectedTask);
     }
   };
 
-  const getGoalProgress = (goal) => {
-    const completedSubTasks = goal.subTasks.filter(task => task.completed).length;
-    return Math.round((completedSubTasks / goal.subTasks.length) * 100);
+  const handleCancelSelection = () => {
+    setSelectedTask(null);
+  };
+
+  const handleFinishTask = (timeSpent: number) => {
+    if (activeTask) {
+      finishSubTask(activeTask.goalId, activeTask.subTaskId, timeSpent, () => setStreak(prev => prev + 1));
+      setActiveTask(null);
+      setSelectedTask(null);
+    }
+  };
+
+  const handleCancelTask = () => {
+    setActiveTask(null);
+    setSelectedTask(null);
   };
 
 
@@ -184,26 +101,43 @@ export default function Home() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-          <StreakBadge streak={streak} />
-        </div>
-
-        {/* Bottom Section */}
         <div className="max-w-5xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <DailyGoals 
-              goals={goals}
-              onToggleSubTask={toggleSubTask}
-              onAddGoal={addGoal}
-              onEditGoal={editGoal}
-              onRemoveGoal={removeGoal}
-              onAddSubTask={addSubTask}
-              onEditSubTask={editSubTask}
-              onRemoveSubTask={removeSubTask}
-              getGoalProgress={getGoalProgress}
-            />
-
-            <Stopwatch />
+            {/* Left Column */}
+            <div className="space-y-6">
+              <StreakBadge streak={streak} />
+              <DailyGoals 
+                goals={goals}
+                onToggleSubTask={handleToggleSubTask}
+                onAddGoal={handleAddGoal}
+                onEditGoal={editGoal}
+                onRemoveGoal={removeGoal}
+                onAddSubTask={handleAddSubTask}
+                onEditSubTask={editSubTask}
+                onRemoveSubTask={removeSubTask}
+                getGoalProgress={getGoalProgress}
+                canAddGoal={canAddGoal}
+                canAddSubTask={canAddSubTask}
+                maxDailyGoals={maxDailyGoals}
+                maxSubTasksPerGoal={maxSubTasksPerGoal}
+                onSelectTask={handleSelectTask}
+                formatTime={formatTime}
+                selectedTask={selectedTask}
+                activeTask={activeTask}
+              />
+            </div>
+            
+            {/* Right Column */}
+            <div>
+              <Stopwatch 
+                selectedTask={selectedTask}
+                activeTask={activeTask}
+                onStartTask={handleStartTask}
+                onFinishTask={handleFinishTask}
+                onCancelTask={handleCancelTask}
+                onCancelSelection={handleCancelSelection}
+              />
+            </div>
           </div>
         </div>
       </div>
