@@ -1,10 +1,12 @@
 "use client";
-import { User } from "lucide-react";
+import { User, Search } from "lucide-react";
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
 import StreakBadge from "./components/StreakBadge";
+import DateTime from "./components/DateTime";
 import DailyGoals from "./components/DailyGoals";
 import Stopwatch from "./components/Stopwatch";
+import TimeRadarChart from "./components/TimeRadarChart";
 import { useGoals } from "./hooks/useGoals";
 
 export default function Home() {
@@ -89,7 +91,7 @@ export default function Home() {
                 className="w-80 pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                <span className="text-gray-400">🔍</span>
+                <Search className="w-4 h-4 text-gray-400" />
               </div>
             </div>
             
@@ -101,43 +103,49 @@ export default function Home() {
         </div>
 
         {/* Summary Cards */}
-        <div className="max-w-5xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Left Column */}
-            <div className="space-y-6">
+        <div className="w-full space-y-3">
+          {/* Top Row */}
+          <div className="flex gap-6">
+            {/* Streak Badge */}
+            <div className="flex-shrink-0 w-80">
               <StreakBadge streak={streak} />
-              <DailyGoals 
-                goals={goals}
-                onToggleSubTask={handleToggleSubTask}
-                onAddGoal={handleAddGoal}
-                onEditGoal={editGoal}
-                onRemoveGoal={removeGoal}
-                onAddSubTask={handleAddSubTask}
-                onEditSubTask={editSubTask}
-                onRemoveSubTask={removeSubTask}
-                getGoalProgress={getGoalProgress}
-                canAddGoal={canAddGoal}
-                canAddSubTask={canAddSubTask}
-                maxDailyGoals={maxDailyGoals}
-                maxSubTasksPerGoal={maxSubTasksPerGoal}
-                onSelectTask={handleSelectTask}
-                formatTime={formatTime}
-                selectedTask={selectedTask}
-                activeTask={activeTask}
-              />
             </div>
             
-            {/* Right Column */}
-            <div>
-              <Stopwatch 
-                selectedTask={selectedTask}
-                activeTask={activeTask}
-                onStartTask={handleStartTask}
-                onFinishTask={handleFinishTask}
-                onCancelTask={handleCancelTask}
-                onCancelSelection={handleCancelSelection}
+            {/* DateTime */}
+            <div className="flex-shrink-0 w-80">
+              <DateTime />
+            </div>
+            
+            {/* Radar Chart - Takes remaining width */}
+            <div className="flex-1">
+              <TimeRadarChart 
+                goals={goals}
+                formatTime={formatTime}
               />
             </div>
+          </div>
+          
+          {/* Bottom Row - Daily Goals spanning under Streak + DateTime */}
+          <div className="w-[680px]">
+            <DailyGoals 
+              goals={goals}
+              onToggleSubTask={handleToggleSubTask}
+              onAddGoal={handleAddGoal}
+              onEditGoal={editGoal}
+              onRemoveGoal={removeGoal}
+              onAddSubTask={handleAddSubTask}
+              onEditSubTask={editSubTask}
+              onRemoveSubTask={removeSubTask}
+              getGoalProgress={getGoalProgress}
+              canAddGoal={canAddGoal}
+              canAddSubTask={canAddSubTask}
+              maxDailyGoals={maxDailyGoals}
+              maxSubTasksPerGoal={maxSubTasksPerGoal}
+              onSelectTask={handleSelectTask}
+              formatTime={formatTime}
+              selectedTask={selectedTask}
+              activeTask={activeTask}
+            />
           </div>
         </div>
       </div>

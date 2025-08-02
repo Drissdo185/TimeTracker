@@ -26,9 +26,31 @@ export function useGoals() {
       completed: false,
       expanded: false,
       subTasks: [
-        { id: 1, text: "Complete market research", completed: false },
-        { id: 2, text: "Design product mockups", completed: false },
-        { id: 3, text: "Develop MVP features", completed: false }
+        { id: 1, text: "Complete market research", completed: true, timeSpent: 7200 }, // 2 hours
+        { id: 2, text: "Design product mockups", completed: true, timeSpent: 5400 }, // 1.5 hours
+        { id: 3, text: "Develop MVP features", completed: false, timeSpent: 3600 } // 1 hour
+      ]
+    },
+    {
+      id: 2,
+      title: "Improve Team Productivity",
+      completed: false,
+      expanded: false,
+      subTasks: [
+        { id: 4, text: "Implement daily standups", completed: true, timeSpent: 1800 }, // 30 minutes
+        { id: 5, text: "Set up project tracking", completed: true, timeSpent: 2700 }, // 45 minutes
+        { id: 6, text: "Create team guidelines", completed: false }
+      ]
+    },
+    {
+      id: 3,
+      title: "Learn New Technology",
+      completed: false,
+      expanded: false,
+      subTasks: [
+        { id: 7, text: "Read documentation", completed: true, timeSpent: 4500 }, // 1.25 hours
+        { id: 8, text: "Build sample project", completed: false, timeSpent: 1800 }, // 30 minutes
+        { id: 9, text: "Write tutorial blog post", completed: false }
       ]
     }
   ]);
@@ -107,7 +129,7 @@ export function useGoals() {
     ));
   };
 
-  const toggleSubTask = (goalId: number, subTaskId: number) => {
+  const toggleSubTask = (goalId: number, subTaskId: number, onCompleted?: () => void) => {
     setGoals(goals.map(goal =>
       goal.id === goalId
         ? {
@@ -120,6 +142,15 @@ export function useGoals() {
           }
         : goal
     ));
+    
+    // Call the callback if a task was completed
+    if (onCompleted) {
+      const goal = goals.find(g => g.id === goalId);
+      const subTask = goal?.subTasks.find(st => st.id === subTaskId);
+      if (subTask && !subTask.completed) { // Was not completed, now it is
+        onCompleted();
+      }
+    }
   };
 
   const finishSubTask = (goalId: number, subTaskId: number, timeSpent: number, onAllCompleted?: () => void) => {

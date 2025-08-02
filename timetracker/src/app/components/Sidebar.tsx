@@ -1,3 +1,22 @@
+import { 
+  BarChart3, 
+  Lightbulb, 
+  RefreshCw, 
+  MessageSquare, 
+  Users, 
+  Repeat, 
+  Clipboard, 
+  MessageCircle, 
+  Settings, 
+  HelpCircle, 
+  LogOut, 
+  Star,
+  Clock
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+
 export default function Sidebar() {
   return (
     <div className="w-64 bg-white shadow-lg h-screen flex flex-col">
@@ -5,7 +24,7 @@ export default function Sidebar() {
       <div className="p-6">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-          
+            <Clock className="w-5 h-5 text-white" />
           </div>
           <h1 className="text-xl text-green-400 font-semibold">Treki</h1>
         </div>
@@ -17,24 +36,24 @@ export default function Sidebar() {
           <h3 className="text-gray-400 text-sm font-medium mb-3">Menu</h3>
           <nav className="space-y-1">
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-green-600 bg-green-50 rounded-lg">
-              <span>📊</span>
+              <BarChart3 className="w-4 h-4" />
               <span>Dashboard</span>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <span>💡</span>
+              <Lightbulb className="w-4 h-4" />
               <span>Insights</span>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <span>🔄</span>
+              <RefreshCw className="w-4 h-4" />
               <span>Updates</span>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <span>💬</span>
+              <MessageSquare className="w-4 h-4" />
               <span>Message</span>
-              <span className="ml-auto bg-gray-200 text-xs px-2 py-1 rounded-full">20</span>
+              <Badge variant="secondary" className="ml-auto">20</Badge>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <span>👥</span>
+              <Users className="w-4 h-4" />
               <span>Customers</span>
             </a>
           </nav>
@@ -45,15 +64,15 @@ export default function Sidebar() {
           <h3 className="text-gray-400 text-sm font-medium mb-3">FEATURES</h3>
           <nav className="space-y-1">
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <span>🔁</span>
+              <Repeat className="w-4 h-4" />
               <span>Recurring</span>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <span>📋</span>
+              <Clipboard className="w-4 h-4" />
               <span>Subscriptions</span>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <span>💭</span>
+              <MessageCircle className="w-4 h-4" />
               <span>Feedback</span>
             </a>
           </nav>
@@ -64,11 +83,11 @@ export default function Sidebar() {
           <h3 className="text-gray-400 text-sm font-medium mb-3">GENERAL</h3>
           <nav className="space-y-1">
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <span>⚙️</span>
+              <Settings className="w-4 h-4" />
               <span>Settings</span>
             </a>
             <a href="#" className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 rounded-lg">
-              <span>❓</span>
+              <HelpCircle className="w-4 h-4" />
               <span>Help Desk</span>
             </a>
           </nav>
@@ -78,21 +97,21 @@ export default function Sidebar() {
       {/* Footer */}
       <div className="p-4">
         <a href="#" className="flex items-center gap-3 px-3 py-2 text-red-500 hover:bg-red-50 rounded-lg mb-4">
-          <span>🚪</span>
+          <LogOut className="w-4 h-4" />
           <span>Log out</span>
         </a>
 
         {/* Upgrade Card */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg p-4 text-white">
+        <Card className="bg-gradient-to-r from-green-500 to-emerald-500 border-0 p-4 text-white">
           <div className="flex items-center gap-2 mb-2">
-            <span>⭐</span>
+            <Star className="w-4 h-4" />
             <span className="font-semibold">Upgrade Pro!</span>
           </div>
           <p className="text-sm opacity-90 mb-3">Higher productivity with better organization</p>
-          <button className="bg-white text-green-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100">
+          <Button variant="secondary" size="sm" className="bg-white text-green-600 hover:bg-gray-100">
             Upgrade Pro
-          </button>
-        </div>
+          </Button>
+        </Card>
       </div>
     </div>
   );

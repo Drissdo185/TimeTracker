@@ -1,11 +1,12 @@
 "use client";
 import { useState } from "react";
-import { Plus, Edit2, Trash2, Check, X } from "lucide-react";
+import { Plus, Edit2, Trash2, Check, X, Clock } from "lucide-react";
 
 interface SubTask {
   id: number;
   text: string;
   completed: boolean;
+  timeSpent?: number; // in seconds
 }
 
 interface Goal {
@@ -265,8 +266,9 @@ export default function DailyGoals({
                           {subTask.text}
                         </button>
                         {subTask.completed && subTask.timeSpent && (
-                          <span className="text-xs text-green-600 mt-1">
-                            ⏱️ {formatTime(subTask.timeSpent)}
+                          <span className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {formatTime(subTask.timeSpent)}
                           </span>
                         )}
                       </div>
