@@ -7,19 +7,15 @@ import DateTime from "../components/DateTime";
 import DailyGoals from "../components/DailyGoals";
 import Stopwatch from "../components/Stopwatch";
 import TimeRadarChart from "../components/TimeRadarChart";
-import { useGoalsApi } from "../hooks/useGoalsApi";
-import { useAuth } from "@/components/auth/AuthProvider";
+import { useGoals } from "../hooks/useGoals";
 
 export default function Dashboard() {
-  const { user, signOut } = useAuth()
   const [streak, setStreak] = useState(0);
   const [selectedTask, setSelectedTask] = useState<{goalId: number, subTaskId: number, taskName: string} | null>(null);
   const [activeTask, setActiveTask] = useState<{goalId: number, subTaskId: number, taskName: string} | null>(null);
   
   const {
     goals,
-    loading,
-    error,
     addGoal,
     editGoal,
     removeGoal,
@@ -34,7 +30,7 @@ export default function Dashboard() {
     formatTime,
     maxDailyGoals,
     maxSubTasksPerGoal
-  } = useGoalsApi();
+  } = useGoals();
 
   const handleToggleSubTask = (goalId: number, subTaskId: number) => {
     toggleSubTask(goalId, subTaskId, () => setStreak(prev => prev + 1));
@@ -75,22 +71,6 @@ export default function Dashboard() {
     setSelectedTask(null);
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-lg text-red-600">Error: {error}</div>
-      </div>
-    )
-  }
-
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar />
@@ -114,24 +94,9 @@ export default function Dashboard() {
               </div>
             </div>
             
-            {/* User Avatar with Dropdown */}
-            <div className="relative group">
-              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-medium cursor-pointer">
-                <User size={20} />
-              </div>
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
-                <div className="py-1">
-                  <div className="px-4 py-2 text-sm text-gray-700 border-b">
-                    {user?.email}
-                  </div>
-                  <button
-                    onClick={signOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </div>
+            {/* User Avatar */}
+            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-medium">
+              <User size={20} />
             </div>
           </div>
         </div>

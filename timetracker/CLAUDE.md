@@ -39,8 +39,8 @@ This is a Next.js 15 application using the App Router architecture with TypeScri
 ### Application Architecture
 
 #### State Management
-- Uses custom React hooks for state management (no external state library)
-- `useGoals` hook manages all goal-related state and operations
+- Uses custom React hooks for local state management (no external state library)
+- `useGoals` hook manages all goal-related state and operations in memory
 - Local state with `useState` for UI interactions
 
 #### Data Flow
